@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query, Response
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from http import HTTPStatus
 from typing import Annotated
@@ -15,6 +16,7 @@ from shop_api.models import (
 )
 
 app = FastAPI(title="Shop API")
+Instrumentator().instrument(app).expose(app)
 
 _items: dict[int, ItemResponse] = {}
 _carts: dict[int, dict[int, int]] = {}

@@ -5,7 +5,7 @@ from http import HTTPStatus
 from typing import Annotated
 from pydantic import NonNegativeInt, PositiveInt
 
-import models
+from . import models
 from shop_api.schemas import (
     CartCreatedResponse,
     CartItemResponse,
@@ -15,7 +15,7 @@ from shop_api.schemas import (
     ItemPut,
     ItemResponse
 )
-from database import engine, SessionLocal
+from .database import engine, SessionLocal
 
 models.Base.metadata.create_all(bind=engine)
 

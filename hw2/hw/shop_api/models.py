@@ -1,36 +1,24 @@
-from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
+from database import Base
 
-class ItemCreate(BaseModel):
-    name: str
-    price: float = Field(ge=0)
-    model_config = ConfigDict(extra="forbid")
+class DBItem(Base):
+    __tablename__ = "items"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    price = Column(Float)
+    deleted = Column(Boolean, default=False)
 
-class ItemPut(BaseModel):
-    name: str
-    price: float = Field(ge=0)
-    model_config = ConfigDict(extra="forbid")
+class DBCart(Base):
+    __tablename__ = "carts"
+    id = Column(Integer, primary_key=True, index=True)
+    items = relationship("DBCartItem", back_populates="cart")
 
-class ItemPatch(BaseModel):
-    name: str | None = None
-    price: float | None = Field(default=None, ge=0)
-    model_config = ConfigDict(extra="forbid")
-
-class ItemResponse(BaseModel):
-    id: int
-    name: str
-    price: float
-    deleted: bool = False
-
-class CartItemResponse(BaseModel):
-    id: int
-    name: str
-    quantity: int
-    available: bool
-
-class CartResponse(BaseModel):
-    id: int
-    items: list[CartItemResponse]
-    price: float
-
-class CartCreatedResponse(BaseModel):
-    id: int
+class DBCartItem(Base):
+    __tablename__ = "cart_items"
+    cart_id = Column(Integer, ForeignKey("carts.id"), primary_key=True)
+    item_id = Column(Integer, ForeignKey("items.id"), primary_key=True)
+    quantity = Column(Integer, default=1)
+    
+    cart = relationship("DBCart", back_populates="items")
+    item = relationship("DBItem")
